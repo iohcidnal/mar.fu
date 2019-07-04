@@ -13,5 +13,12 @@ export default function useHandleChangeText(initialState) {
     []
   );
 
-  return [state, handleChangeText];
+  const resetState = React.useCallback(
+    () => {
+      setState(initialState);
+    },
+    [initialState]
+  );
+
+  return [state, handleChangeText, resetState];
 }

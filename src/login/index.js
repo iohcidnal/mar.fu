@@ -1,15 +1,38 @@
 import React from 'react';
-import { Container, Content, Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
+import { StyleSheet, View } from 'react-native';
+import PropTypes from 'prop-types';
+import { Container, Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
+import SegmentedControlTab from 'react-native-segmented-control-tab';
+
 import { useHandleChangeText } from '../common';
 import { auth } from '../db';
+
+export const styles = StyleSheet.create({
+  loginSignUpSegmentedStyle: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  }
+});
 
 const initialState = {
   emailAddress: '',
   password: ''
 };
 
-export default function Login() {
+export default function Login({ navigation }) {
   const [state, handleChangeText] = useHandleChangeText(initialState);
+  const shouldNavigateSetParams = React.useRef(true);
+
+  React.useEffect(
+    () => {
+      if (shouldNavigateSetParams.current) {
+        navigation.setParams({ handleSegmentChange: () => navigation.navigate('SignUp') });
+      }
+      shouldNavigateSetParams.current = false;
+    },
+    [navigation]
+  );
 
   async function handleLogin() {
     try {
@@ -18,8 +41,9 @@ export default function Login() {
     } catch (error) {
       Toast.show({
         text: error.message,
-        buttonText: 'Okay',
-        duration: 5000,
+        buttonText: 'OK',
+        duration: 8000,
+        position: 'top',
         type: 'danger',
       });
     }
@@ -27,7 +51,7 @@ export default function Login() {
 
   return (
     <Container>
-      <Content>
+      <View>
         <Form>
           <Item>
             <Icon active name="mail" />
@@ -53,7 +77,23 @@ export default function Login() {
             <Text>Login</Text>
           </Button>
         </Form>
-      </Content>
+      </View>
     </Container>
   );
 }
+
+Login.navigationOptions = ({ navigation }) => ({
+  headerTitle:
+    <View style={styles.loginSignUpSegmentedStyle}>
+      <SegmentedControlTab
+        tabsContainerStyle={{ width: 200 }}
+        values={['Login', 'Sign up']}
+        selectedIndex={0}
+        onTabPress={navigation.getParam('handleSegmentChange')}
+      />
+    </View>
+});
+
+Login.propTypes = {
+  navigation: PropTypes.object.isRequired,
+};
