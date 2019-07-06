@@ -1,4 +1,4 @@
-import { Constants } from 'expo';
+import Constants from 'expo-constants';
 
 // Replace values with your settings from
 // https://console.firebase.google.com/project/(your-project-id)/settings/cloudmessaging
