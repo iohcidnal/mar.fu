@@ -1,3 +1,4 @@
 export { default as useHandleChangeText } from './useHandleChangeText';
 export { default as HelpText } from './HelpText';
 export { doesExist, isExact } from './validations';
+export { default as Banner } from './Banner';

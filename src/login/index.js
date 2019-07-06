@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import PropTypes from 'prop-types';
-import { Container, Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
+import { Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 
-import { useHandleChangeText } from '../common';
+import { useHandleChangeText, Banner } from '../common';
 import { auth } from '../db';
 
 export const styles = StyleSheet.create({
@@ -50,7 +50,8 @@ export default function Login({ navigation }) {
   }
 
   return (
-    <Container>
+    <View>
+      <Banner iconName="happy" title="Welcome" description="Use your email and password to log in to your account." />
       <View>
         <Form>
           <Item>
@@ -78,7 +79,7 @@ export default function Login({ navigation }) {
           </Button>
         </Form>
       </View>
-    </Container>
+    </View>
   );
 }
 

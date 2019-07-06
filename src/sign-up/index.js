@@ -5,7 +5,7 @@ import { Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { useHandleChangeText, doesExist, isExact, HelpText } from '../common';
+import { useHandleChangeText, doesExist, isExact, HelpText, Banner } from '../common';
 import { auth, db } from '../db';
 import { styles } from '../login/index';
 
@@ -108,6 +108,7 @@ export default function SignUp({ navigation }) {
   return (
     <KeyboardAwareScrollView>
       <View>
+        <Banner iconName="person-add" title="Sign up" description="If your email was invited, you will be a family member of the inviter." />
         <Form>
           <Item error={!!validationError.name}>
             <Icon active name="person" />
