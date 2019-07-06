@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import PropTypes from 'prop-types';
-import { Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
+import { Form, Item, Input, Icon } from 'native-base';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 
-import { useHandleChangeText, Banner } from '../common';
+import { useHandleChangeText, useSubmit, Banner, Button } from '../common';
 import { auth } from '../db';
 
 export const styles = StyleSheet.create({
@@ -22,6 +22,7 @@ const initialState = {
 
 export default function Login({ navigation }) {
   const [state, handleChangeText] = useHandleChangeText(initialState);
+  const [isSubmitting, handleSubmit] = useSubmit(loginAsync);
   const shouldNavigateSetParams = React.useRef(true);
 
   React.useEffect(
@@ -34,24 +35,15 @@ export default function Login({ navigation }) {
     [navigation]
   );
 
-  async function handleLogin() {
-    try {
-      await auth.signInWithEmailAndPassword(state.emailAddress, state.password);
-      // STOPHERE: navigate to family member screen
-    } catch (error) {
-      Toast.show({
-        text: error.message,
-        buttonText: 'OK',
-        duration: 8000,
-        position: 'top',
-        type: 'danger',
-      });
-    }
+  async function loginAsync() {
+    await auth.signInWithEmailAndPassword(state.emailAddress, state.password);
+    console.log('login success!');
+    // STOPHERE: navigate to family member screen
   }
 
   return (
     <View>
-      <Banner iconName="happy" title="Welcome" description="Use your email and password to log in to your account." />
+      <Banner iconName="happy" title="Welcome to mar.fu" description="Use your email and password to log in to your account." />
       <View>
         <Form>
           <Item>
@@ -74,9 +66,12 @@ export default function Login({ navigation }) {
               onChangeText={text => handleChangeText('password', text)}
             />
           </Item>
-          <Button block style={{ margin: 20 }} onPress={handleLogin}>
-            <Text>Login</Text>
-          </Button>
+          <Button
+            label="Login"
+            style={{ margin: 20 }}
+            isSubmitting={isSubmitting}
+            onPress={handleSubmit}
+          />
         </Form>
       </View>
     </View>

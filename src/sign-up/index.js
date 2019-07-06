@@ -1,11 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
-import { Form, Item, Input, Button, Text, Icon, Toast } from 'native-base';
+import { Form, Item, Input, Icon } from 'native-base';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { useHandleChangeText, doesExist, isExact, HelpText, Banner } from '../common';
+import { useHandleChangeText, useSubmit, doesExist, isExact, HelpText, Banner, Button } from '../common';
 import { auth, db } from '../db';
 import { styles } from '../login/index';
 
@@ -18,9 +18,9 @@ const initialState = {
 
 export default function SignUp({ navigation }) {
   const [state, handleChangeText, resetState] = useHandleChangeText(initialState);
+  const [isSubmitting, handleSubmit] = useSubmit(signUpAsync, 'Your account has been created. Please check your email to verify your account.');
   const [validationError, setValidationError] = React.useState({});
   const shouldNavigateSetParams = React.useRef(true);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(
     () => {
@@ -48,50 +48,30 @@ export default function SignUp({ navigation }) {
     return null;
   }
 
-  async function handleSignUp() {
+  async function signUpAsync() {
     const validationError = validate();
     setValidationError(validationError);
-    if (Object.keys(validationError).length) return;
+    if (Object.keys(validationError).length) throw new Error('Please fix required fields.');
 
-    try {
-      setIsSubmitting(true);
-      const userCredential = await auth.createUserWithEmailAndPassword(state.emailAddress, state.password);
-      const memberOfUid = await getInvitation();
-      await db
-        .collection('users')
-        .doc(userCredential.user.uid)
-        .set(
-          {
-            uid: userCredential.user.uid,
-            name: state.name,
-            memberOfUid: memberOfUid || userCredential.user.uid,
-            lowerCaseName: state.name.toLowerCase()
-          },
-          { merge: true }
-        );
-      await auth.currentUser.updateProfile({ displayName: state.name });
-      await auth.currentUser.sendEmailVerification();
-      await auth.signOut();
+    const userCredential = await auth.createUserWithEmailAndPassword(state.emailAddress, state.password);
+    const memberOfUid = await getInvitation();
+    await db
+      .collection('users')
+      .doc(userCredential.user.uid)
+      .set(
+        {
+          uid: userCredential.user.uid,
+          name: state.name,
+          memberOfUid: memberOfUid || userCredential.user.uid,
+          lowerCaseName: state.name.toLowerCase()
+        },
+        { merge: true }
+      );
+    await auth.currentUser.updateProfile({ displayName: state.name });
+    await auth.currentUser.sendEmailVerification();
+    await auth.signOut();
 
-      resetState();
-      Toast.show({
-        text: 'Your account has been created. Please check your email to verify your account.',
-        buttonText: 'OK',
-        duration: 8000,
-        position: 'top',
-        type: 'success'
-      });
-    } catch (error) {
-      Toast.show({
-        text: error.message,
-        buttonText: 'OK',
-        duration: 8000,
-        position: 'top',
-        type: 'danger',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    resetState();
   }
 
   function validate() {
@@ -155,13 +135,11 @@ export default function SignUp({ navigation }) {
             <HelpText message={validationError.confirmPassword} />
           </Item>
           <Button
-            block
+            label="Sign up"
             style={{ margin: 20 }}
-            onPress={handleSignUp}
-            disabled={isSubmitting}
-          >
-            <Text>{!isSubmitting ? 'Sign up' : 'Submitting...'}</Text>
-          </Button>
+            isSubmitting={isSubmitting}
+            onPress={handleSubmit}
+          />
         </Form>
       </View>
     </KeyboardAwareScrollView>
