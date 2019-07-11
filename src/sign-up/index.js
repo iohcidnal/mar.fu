@@ -88,7 +88,7 @@ export default function SignUp({ navigation }) {
   return (
     <KeyboardAwareScrollView>
       <View>
-        <Banner iconName="person-add" title="Sign up" description="If your email was invited, you will be a family member of the inviter." />
+        <Banner iconName="person-add" title="Sign up" description="Create an account to keep track of your family's medications." />
         <Form>
           <Item error={!!validationError.name}>
             <Icon active name="person" />
