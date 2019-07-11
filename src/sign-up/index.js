@@ -32,29 +32,12 @@ export default function SignUp({ navigation }) {
     [navigation]
   );
 
-  async function getInvitation() {
-    // If the email was invited, then the inviter will be the memberOfUid in the users collection
-    // making this email a family member of the inviter.
-    const doc = db
-      .collection('invites')
-      .doc(state.emailAddress.toLowerCase().trim());
-    const invite = await doc.get();
-
-    if (invite.exists) {
-      await doc.set({ didAcceptInvite: true }, { merge: true });
-      return invite.data().memberOfUid;
-    }
-
-    return null;
-  }
-
   async function signUpAsync() {
     const validationError = validate();
     setValidationError(validationError);
     if (Object.keys(validationError).length) throw new Error('Please fix required fields.');
 
     const userCredential = await auth.createUserWithEmailAndPassword(state.emailAddress, state.password);
-    const memberOfUid = await getInvitation();
     await db
       .collection('users')
       .doc(userCredential.user.uid)
@@ -62,7 +45,7 @@ export default function SignUp({ navigation }) {
         {
           uid: userCredential.user.uid,
           name: state.name,
-          memberOfUid: memberOfUid || userCredential.user.uid,
+          memberOfUid: null,
           lowerCaseName: state.name.toLowerCase()
         },
         { merge: true }
