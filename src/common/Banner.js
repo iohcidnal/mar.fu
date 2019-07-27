@@ -27,10 +27,10 @@ const styles = {
   },
 };
 
-export default function Banner({ iconName, title, description }) {
+export default function Banner({ iconName, iconType = 'Ionicons', title, description }) {
   return (
     <View style={styles.root}>
-      {iconName && <Icon name={iconName} style={styles.icon} />}
+      {iconName && <Icon name={iconName} type={iconType} style={styles.icon} />}
       {title && <Text style={styles.title}>{title}</Text>}
       {description && <Text style={styles.description}>{description}</Text>}
     </View>
@@ -39,6 +39,7 @@ export default function Banner({ iconName, title, description }) {
 
 Banner.propTypes = {
   iconName: PropTypes.node,
+  iconType: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
 };
