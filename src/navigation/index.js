@@ -3,11 +3,11 @@ import { createStackNavigator, createAppContainer, createSwitchNavigator } from 
 import NavigationLoader from './NavigationLoader';
 import Login from '../login';
 import SignUp from '../sign-up';
-import MyMeds from '../my-meds';
+import { MyMeds, NewRecordForm } from '../my-meds';
 
 const LoginNavigator = createStackNavigator({ Login });
 const SignUpNavigator = createStackNavigator({ SignUp });
-const MyMedsNavigator = createStackNavigator({ MyMeds });
+const MyMedsNavigator = createStackNavigator({ MyMeds, NewRecordForm });
 
 export default createAppContainer(
   createSwitchNavigator(
