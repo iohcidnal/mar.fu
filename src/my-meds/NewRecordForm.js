@@ -1,9 +1,9 @@
 import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
-import { Container, Icon, Form, Item, Input } from 'native-base';
+import { Container, Form } from 'native-base';
 
-import { Banner, Button, useHandleChangeText, useSubmit } from '../common';
+import { Banner, Button, Textbox, useHandleChangeText, useSubmit, doesExist, useValidation } from '../common';
 import { auth, db } from '../db';
 
 const initialState = {
@@ -14,8 +14,11 @@ const initialState = {
 export default function NewRecordForm({ navigation }) {
   const [state, handleChangeText] = useHandleChangeText(initialState);
   const [isSubmitting, handleSubmit] = useSubmit(createNewRecord, 'New record created successfully.');
+  const [validate, validationError] = useValidation(() => validateForm());
 
   async function createNewRecord() {
+    validate();
+
     const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
     await db
       .collection('my-meds')
@@ -31,27 +34,33 @@ export default function NewRecordForm({ navigation }) {
     navigation.navigate('MyMeds');
   }
 
+  function validateForm() {
+    return {
+      ...(!doesExist(state.name) && { name: 'Required' }),
+      ...(!doesExist(state.description) && { description: 'Required' }),
+    };
+  }
+
   return (
     <Container>
       <Banner title="New Record" iconName="folder" />
       <Form>
-        <Item>
-          <Icon active name="folder" />
-          <Input
-            placeholder="Name"
-            autoCapitalize="words"
-            value={state.name}
-            onChangeText={text => handleChangeText('name', text)}
-          />
-        </Item>
-        <Item fixedLabel>
-          <Icon active type="MaterialIcons" name="description" />
-          <Input
-            placeholder="Description"
-            value={state.description}
-            onChangeText={text => handleChangeText('description', text)}
-          />
-        </Item>
+        <Textbox
+          iconName="folder"
+          placeholder="Name"
+          autoCapitalize="words"
+          value={state.name}
+          onChangeText={text => handleChangeText('name', text)}
+          errorMessage={validationError.name}
+        />
+        <Textbox
+          iconName="description"
+          iconType="MaterialIcons"
+          placeholder="Description"
+          value={state.description}
+          onChangeText={text => handleChangeText('description', text)}
+          errorMessage={validationError.description}
+        />
       </Form>
       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 20 }}>
         <Button
@@ -73,4 +82,3 @@ export default function NewRecordForm({ navigation }) {
 NewRecordForm.propTypes = {
   navigation: PropTypes.object.isRequired
 };
-
