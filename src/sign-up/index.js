@@ -1,11 +1,11 @@
 import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
-import { Form, Item, Input, Icon } from 'native-base';
+import { Form } from 'native-base';
 import SegmentedControlTab from 'react-native-segmented-control-tab';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { useHandleChangeText, useSubmit, doesExist, isExact, HelpText, Banner, Button } from '../common';
+import { useHandleChangeText, useSubmit, doesExist, isExact, Textbox, Banner, Button, useValidation } from '../common';
 import { auth, db } from '../db';
 import { styles } from '../login/index';
 
@@ -19,7 +19,7 @@ const initialState = {
 export default function SignUp({ navigation }) {
   const [state, handleChangeText, resetState] = useHandleChangeText(initialState);
   const [isSubmitting, handleSubmit] = useSubmit(signUpAsync, 'Your account has been created. Please check your email to verify your account.');
-  const [validationError, setValidationError] = React.useState({});
+  const [validate, validationError] = useValidation(() => validateForm());
   const shouldNavigateSetParams = React.useRef(true);
 
   React.useEffect(
@@ -33,9 +33,7 @@ export default function SignUp({ navigation }) {
   );
 
   async function signUpAsync() {
-    const validationError = validate();
-    setValidationError(validationError);
-    if (Object.keys(validationError).length) throw new Error('Please fix required fields.');
+    validate();
 
     const userCredential = await auth.createUserWithEmailAndPassword(state.emailAddress, state.password);
     await db
@@ -57,7 +55,7 @@ export default function SignUp({ navigation }) {
     resetState();
   }
 
-  function validate() {
+  function validateForm() {
     const { name, emailAddress, password, confirmPassword } = state;
     return {
       ...(!doesExist(name) && { name: 'Required' }),
@@ -73,50 +71,42 @@ export default function SignUp({ navigation }) {
       <View>
         <Banner iconName="person-add" title="Sign up" description="Create an account to keep track of your family's medications." />
         <Form>
-          <Item error={!!validationError.name}>
-            <Icon active name="person" />
-            <Input
-              placeholder="Name"
-              textContentType="givenName"
-              autoCapitalize="words"
-              value={state.name}
-              onChangeText={text => handleChangeText('name', text)}
-            />
-            <HelpText message={validationError.name} />
-          </Item>
-          <Item error={!!validationError.emailAddress}>
-            <Icon active name="mail" />
-            <Input
-              placeholder="Email address"
-              textContentType="emailAddress"
-              autoCapitalize="none"
-              value={state.emailAddress}
-              onChangeText={text => handleChangeText('emailAddress', text)}
-            />
-            <HelpText message={validationError.emailAddress} />
-          </Item>
-          <Item error={!!validationError.password}>
-            <Icon active name="lock" />
-            <Input
-              placeholder="Password"
-              textContentType="password"
-              secureTextEntry
-              value={state.password}
-              onChangeText={text => handleChangeText('password', text)}
-            />
-            <HelpText message={validationError.password} />
-          </Item>
-          <Item error={!!validationError.confirmPassword}>
-            <Icon active name="lock" />
-            <Input
-              placeholder="Confirm password"
-              textContentType="password"
-              secureTextEntry
-              value={state.confirmPassword}
-              onChangeText={text => handleChangeText('confirmPassword', text)}
-            />
-            <HelpText message={validationError.confirmPassword} />
-          </Item>
+          <Textbox
+            iconName="person"
+            placeholder="Name"
+            textContentType="givenName"
+            autoCapitalize="words"
+            value={state.name}
+            onChangeText={text => handleChangeText('name', text)}
+            errorMessage={validationError.name}
+          />
+          <Textbox
+            iconName="mail"
+            placeholder="Email address"
+            textContentType="emailAddress"
+            autoCapitalize="none"
+            value={state.emailAddress}
+            onChangeText={text => handleChangeText('emailAddress', text)}
+            errorMessage={validationError.emailAddress}
+          />
+          <Textbox
+            iconName="lock"
+            placeholder="Password"
+            textContentType="password"
+            secureTextEntry
+            value={state.password}
+            onChangeText={text => handleChangeText('password', text)}
+            errorMessage={validationError.password}
+          />
+          <Textbox
+            iconName="lock"
+            placeholder="Confirm password"
+            textContentType="password"
+            secureTextEntry
+            value={state.confirmPassword}
+            onChangeText={text => handleChangeText('confirmPassword', text)}
+            errorMessage={validationError.confirmPassword}
+          />
           <Button
             label="Sign up"
             style={{ margin: 20 }}
