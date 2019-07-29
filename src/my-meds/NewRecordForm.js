@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { Container, Form } from 'native-base';
+import firebase from 'firebase';
 
 import { Banner, Button, Textbox, useHandleChangeText, useSubmit, doesExist, useValidation } from '../common';
 import { auth, db } from '../db';
@@ -13,24 +14,23 @@ const initialState = {
 
 export default function NewRecordForm({ navigation }) {
   const [state, handleChangeText] = useHandleChangeText(initialState);
-  const [isSubmitting, handleSubmit] = useSubmit(createNewRecord, 'New record created successfully.');
+  const [isSubmitting, handleSubmit] = useSubmit(addNewRecord, 'New record created successfully.');
   const [validate, validationError] = useValidation(() => validateForm());
 
-  async function createNewRecord() {
+  async function addNewRecord() {
     validate();
 
     const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
-    await db
-      .collection('my-meds')
-      .doc(userUid)
-      .set(
-        {
-          uid: userUid,
-          name: state.name,
-          description: state.description,
-        },
-        { merge: true }
-      );
+    const docRef = db.collection('myMedRecords').doc(userUid);
+    await docRef.collection('records')
+      .add({
+        name: state.name,
+        description: state.description,
+        sharedWith: [],
+        medications: [],
+        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+
     navigation.navigate('MyMeds');
   }
 
