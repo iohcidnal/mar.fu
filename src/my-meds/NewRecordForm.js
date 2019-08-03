@@ -31,7 +31,7 @@ export default function NewRecordForm({ navigation }) {
         createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
       });
 
-    navigation.navigate('MyMeds');
+    navigation.goBack();
   }
 
   function validateForm() {
@@ -72,7 +72,7 @@ export default function NewRecordForm({ navigation }) {
         <Button
           style={{ width: 200 }}
           label="Cancel"
-          onPress={() => navigation.navigate('MyMeds')}
+          onPress={() => navigation.goBack()}
         />
       </View>
     </Container>
