@@ -12,24 +12,33 @@ const initialState = {
   description: ''
 };
 
-export default function NewRecordForm({ navigation }) {
-  const [state, handleChangeText] = useHandleChangeText(initialState);
-  const [isSubmitting, handleSubmit] = useSubmit(addNewRecord, 'New record created successfully.');
+export default function RecordForm({ navigation }) {
+  const [state, handleChangeText] = useHandleChangeText(navigation.getParam('initialState', initialState));
+  const [isSubmitting, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Record updated' : 'New record created'} successfully.`);
   const [validate, validationError] = useValidation(() => validateForm());
 
-  async function addNewRecord() {
+  async function saveForm() {
     validate();
 
     const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
     const docRef = db.collection('myMedRecords').doc(userUid);
-    await docRef.collection('records')
-      .add({
-        name: state.name,
-        description: state.description,
-        sharedWith: [],
-        medications: [],
-        createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+
+    if (state.id) {
+      await docRef.collection('records').doc(state.id)
+        .set({
+          name: state.name,
+          description: state.description,
+        }, { merge: true });
+    } else {
+      await docRef.collection('records')
+        .add({
+          name: state.name,
+          description: state.description,
+          sharedWith: [],
+          medications: [],
+          createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+    }
 
     navigation.goBack();
   }
@@ -43,7 +52,7 @@ export default function NewRecordForm({ navigation }) {
 
   return (
     <Container>
-      <Banner title="New Record" iconName="folder" />
+      <Banner title={`${state.id ? 'Update' : 'New'} Record`} iconName="folder" />
       <Form>
         <Textbox
           iconName="folder"
@@ -79,6 +88,6 @@ export default function NewRecordForm({ navigation }) {
   );
 }
 
-NewRecordForm.propTypes = {
+RecordForm.propTypes = {
   navigation: PropTypes.object.isRequired
 };

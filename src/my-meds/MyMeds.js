@@ -21,7 +21,7 @@ export default function MyMeds({ navigation }) {
       .get();
     const myMeds = records.docs.reduce(
       (acc, record) => {
-        acc.push(record.data());
+        acc.push({ id: record.id, ...record.data() });
         return acc;
       },
       []
@@ -30,8 +30,20 @@ export default function MyMeds({ navigation }) {
     setIsFetching(false);
   };
 
+  const handleEdit = ({ id, name, description }) => {
+    navigation.navigate('RecordForm', {
+      initialState: {
+        id,
+        name,
+        description,
+      }
+    });
+  };
+
   // eslint-disable-next-line react/prop-types
-  const renderItem = ({ item: { name, description } }) => {
+  const renderItem = ({ item }) => {
+    // eslint-disable-next-line react/prop-types
+    const { name, description } = item;
     return (
       <ListItem onPress={() => console.log('TODO: record view')}>
         <Body>
@@ -43,7 +55,7 @@ export default function MyMeds({ navigation }) {
             <Button rounded bordered onPress={() => console.log('TODO: share')}>
               <Icon name="share" />
             </Button>
-            <Button rounded bordered onPress={() => console.log('TODO: edit')}>
+            <Button rounded bordered onPress={() => handleEdit(item)}>
               <Icon name="create" />
             </Button>
             <Button rounded bordered onPress={() => console.log('TODO: delete')}>
@@ -62,10 +74,10 @@ export default function MyMeds({ navigation }) {
       {!isFetching && myMeds.length === 0 && <Banner iconName="sad" description="You don't have a record at the moment. Please create a new one." />}
       <FlatList
         data={myMeds}
-        keyExtractor={({ createdTimestamp }) => createdTimestamp.toString()}
+        keyExtractor={({ id }) => id}
         renderItem={renderItem}
       />
-      <Fab onPress={() => navigation.navigate('NewRecordForm')}>
+      <Fab onPress={() => navigation.navigate('RecordForm')}>
         <Icon name="add" />
       </Fab>
     </Container>
