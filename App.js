@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppLoading } from 'expo';
 import * as Font from 'expo-font';
+import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 import { Root } from 'native-base';
@@ -40,7 +41,9 @@ export default function App() {
   return (
     <Root>
       <View style={styles.container}>
-        <AppNavigation />
+        <ActionSheetProvider>
+          <AppNavigation />
+        </ActionSheetProvider>
       </View>
     </Root>
   );
