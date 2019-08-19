@@ -31,6 +31,13 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
     setIsFetching(false);
   };
 
+  const handleViewMedications = ({ id: recordId, name }) => {
+    navigation.navigate('Medications', {
+      recordId,
+      medicationTitle: `${name} Medications`
+    });
+  };
+
   const handleEdit = ({ id, name, description }) => {
     navigation.navigate('RecordForm', {
       initialState: {
@@ -86,7 +93,7 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
   const renderItem = value => {
     const { item } = value;
     return (
-      <ListItem onPress={() => console.log('TODO: record view')}>
+      <ListItem onPress={() => handleViewMedications(item)}>
         <Body>
           <View>
             <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
@@ -112,7 +119,7 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
     <Container>
       <NavigationEvents onWillFocus={handleWillFocusScreen} />
       {isFetching && <Spinner />}
-      {!isFetching && myMeds.length === 0 && <Banner iconName="sad" description="You don't have a record at the moment. Please create a new one." />}
+      {!isFetching && myMeds.length === 0 && <Banner iconName="sad" description="You don't have any records at the moment. Please create a new one." />}
       <FlatList
         data={myMeds}
         keyExtractor={item => item.id}
@@ -125,13 +132,14 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
   );
 }
 
-MyMeds.navigationOptions = () => ({
-  title: 'My Medication Records'
-});
+const component = connectActionSheet(MyMeds);
+component.navigationOptions = {
+  title: 'My Records'
+};
 
 MyMeds.propTypes = {
   navigation: PropTypes.object.isRequired,
   showActionSheetWithOptions: PropTypes.func.isRequired,
 };
 
-export default connectActionSheet(MyMeds);
+export default component;

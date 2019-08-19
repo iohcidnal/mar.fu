@@ -9,7 +9,7 @@ export default function NavigationLoader(props) {
 
       async function beginNavigation() {
         const userToken = await AsyncStorage.getItem('user-token');
-        props.navigation.navigate(userToken ? 'MyMeds' : 'Login');
+        props.navigation.navigate(userToken ? 'MyMeds' : 'MyMeds');
       }
     },
     [props.navigation]

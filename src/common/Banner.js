@@ -38,7 +38,7 @@ export default function Banner({ iconName, iconType = 'Ionicons', title, descrip
 }
 
 Banner.propTypes = {
-  iconName: PropTypes.node,
+  iconName: PropTypes.string,
   iconType: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,

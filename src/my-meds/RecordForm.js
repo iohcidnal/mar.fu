@@ -35,7 +35,6 @@ export default function RecordForm({ navigation }) {
           name: state.name,
           description: state.description,
           sharedWith: [],
-          medications: [],
           createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
     }
