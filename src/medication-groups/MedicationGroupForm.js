@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Container, Form } from 'native-base';
 import firebase from 'firebase';
 
-import { Banner, Button, Textbox, useHandleChangeText, useSubmit, doesExist, useValidation } from '../common';
+import { Banner, Button, Textbox, useHandleChangeText, useSubmit, doesExist, useValidation, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, USERS_COLLECTION } from '../common';
 import { auth, db } from '../db';
 
 const initialState = {
@@ -12,30 +12,40 @@ const initialState = {
   description: ''
 };
 
-export default function RecordForm({ navigation }) {
+const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+
+export default function MedicationGroupForm({ navigation }) {
   const [state, handleChangeText] = useHandleChangeText(navigation.getParam('initialState', initialState));
-  const [isSubmitting, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Record updated' : 'New record created'} successfully.`);
+  const [isSubmitting, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Medication group updated' : 'New medication group created'} successfully.`);
   const [validate, validationError] = useValidation(() => validateForm());
 
   async function saveForm() {
     validate();
 
-    const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
-    const docRef = db.collection('myMedRecords').doc(userUid);
+    const docRef = db.collection(GROUPS_FOR_USER_COLLECTION).doc(userUid);
+    const docSnapshot = await docRef.get();
+    if (!docSnapshot.data()) {
+      // create a reference
+      await docRef.set({
+        reference: db
+          .collection(USERS_COLLECTION)
+          .doc(userUid)
+      });
+    }
 
     if (state.id) {
-      await docRef.collection('records').doc(state.id)
+      await docRef.collection(GROUPS_SUBCOLLECTION).doc(state.id)
         .set({
           name: state.name,
           description: state.description,
         }, { merge: true });
     } else {
-      await docRef.collection('records')
+      await docRef.collection(GROUPS_SUBCOLLECTION)
         .add({
           name: state.name,
           description: state.description,
           sharedWith: [],
-          createdTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          createdTimestamp: firebase.firestore.Timestamp.fromDate(new Date())
         });
     }
 
@@ -51,7 +61,7 @@ export default function RecordForm({ navigation }) {
 
   return (
     <Container>
-      <Banner title={`${state.id ? 'Update' : 'New'} Record`} iconName="folder" />
+      <Banner title={`${state.id ? 'Update' : 'New'} Medication Group`} iconName="folder" />
       <Form>
         <Textbox
           iconName="folder"
@@ -87,6 +97,6 @@ export default function RecordForm({ navigation }) {
   );
 }
 
-RecordForm.propTypes = {
+MedicationGroupForm.propTypes = {
   navigation: PropTypes.object.isRequired
 };

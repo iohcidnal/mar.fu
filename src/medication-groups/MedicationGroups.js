@@ -5,41 +5,42 @@ import { NavigationEvents } from 'react-navigation';
 import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-import { Banner } from '../common';
+import { Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
 import { db } from '../db';
 
-function MyMeds({ navigation, showActionSheetWithOptions }) {
-  const [myMeds, setMyMeds] = React.useState([]);
+const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+
+function MedicationGroups({ navigation, showActionSheetWithOptions }) {
+  const [medicationGroups, setMedicationGroups] = React.useState([]);
   const [isFetching, setIsFetching] = React.useState(true);
 
   const handleWillFocusScreen = async () => {
-    const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
     const records = await db
-      .collection('myMedRecords')
+      .collection(GROUPS_FOR_USER_COLLECTION)
       .doc(userUid)
-      .collection('records')
+      .collection(GROUPS_SUBCOLLECTION)
       .orderBy('name')
       .get();
-    const myMeds = records.docs.reduce(
+    const result = records.docs.reduce(
       (acc, record) => {
         acc.push({ id: record.id, ...record.data() });
         return acc;
       },
       []
     );
-    setMyMeds(myMeds);
+    setMedicationGroups(result);
     setIsFetching(false);
   };
 
-  const handleViewMedications = ({ id: recordId, name }) => {
+  const handleViewMedications = ({ id: groupId, name }) => {
     navigation.navigate('Medications', {
-      recordId,
+      groupId,
       medicationTitle: `${name} Medications`
     });
   };
 
   const handleEdit = ({ id, name, description }) => {
-    navigation.navigate('RecordForm', {
+    navigation.navigate('MedicationGroupForm', {
       initialState: {
         id,
         name,
@@ -55,7 +56,7 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
         destructiveButtonIndex: 0,
         cancelButtonIndex: 1,
         title: `Delete ${name}?`,
-        message: 'This will permanently remove this record.'
+        message: 'This will permanently remove this medication group.'
       },
       buttonIndex => {
         if (buttonIndex === 0) {
@@ -64,16 +65,15 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
       });
 
     async function deleteRecordAsync() {
-      const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
       await db
-        .collection('myMedRecords')
+        .collection(GROUPS_FOR_USER_COLLECTION)
         .doc(userUid)
-        .collection('records')
+        .collection(GROUPS_SUBCOLLECTION)
         .doc(id)
         .delete();
 
-      const index = myMeds.findIndex(m => m.id === id);
-      setMyMeds(meds => {
+      const index = medicationGroups.findIndex(m => m.id === id);
+      setMedicationGroups(meds => {
         return [
           ...meds.slice(0, index),
           ...meds.slice(index + 1)
@@ -119,25 +119,25 @@ function MyMeds({ navigation, showActionSheetWithOptions }) {
     <Container>
       <NavigationEvents onWillFocus={handleWillFocusScreen} />
       {isFetching && <Spinner />}
-      {!isFetching && myMeds.length === 0 && <Banner iconName="sad" description="You don't have any records at the moment. Please create a new one." />}
+      {!isFetching && medicationGroups.length === 0 && <Banner iconName="sad" description="You don't have any medication groups at the moment. Please create a new one." />}
       <FlatList
-        data={myMeds}
+        data={medicationGroups}
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
-      <Fab onPress={() => navigation.navigate('RecordForm')}>
+      <Fab onPress={() => navigation.navigate('MedicationGroupForm')}>
         <Icon name="add" />
       </Fab>
     </Container>
   );
 }
 
-const component = connectActionSheet(MyMeds);
+const component = connectActionSheet(MedicationGroups);
 component.navigationOptions = {
-  title: 'My Records'
+  title: 'My Medication Groups'
 };
 
-MyMeds.propTypes = {
+MedicationGroups.propTypes = {
   navigation: PropTypes.object.isRequired,
   showActionSheetWithOptions: PropTypes.func.isRequired,
 };

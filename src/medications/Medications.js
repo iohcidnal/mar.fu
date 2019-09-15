@@ -4,23 +4,20 @@ import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
 import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { firestore } from 'firebase';
 
-import { db } from '../../db';
-import Banner from '../Banner';
-
-const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+import { db } from '../db';
+import { Banner, MEDICATIONS_FOR_GROUP_COLLECTION, MEDICATIONS_SUBCOLLECTION } from '../common';
 
 function Medications({ navigation, showActionSheetWithOptions }) {
-  const recordId = React.useRef(navigation.getParam('recordId'));
+  const groupId = React.useRef(navigation.getParam('groupId'));
   const [medications, setMedications] = React.useState([]);
 
   const handleWillFocusScreen = async () => {
     const medicationsSnapshot = await db
-      .collection('myMedRecords')
-      .doc(userUid)
-      .collection('records')
-      .doc(recordId.current)
-      .collection('medications')
+      .collection(MEDICATIONS_FOR_GROUP_COLLECTION)
+      .doc(groupId.current)
+      .collection(MEDICATIONS_SUBCOLLECTION)
       .orderBy('name')
       .get();
     const medications = medicationsSnapshot.docs.reduce(
@@ -36,7 +33,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
   const handleEdit = item => {
     navigation.navigate('MedicationForm', {
       initialState: { ...item },
-      recordId: recordId.current
+      groupId: groupId.current
     });
   };
 
@@ -57,11 +54,9 @@ function Medications({ navigation, showActionSheetWithOptions }) {
 
     async function deleteAsync() {
       await db
-        .collection('myMedRecords')
-        .doc(userUid)
-        .collection('records')
-        .doc(recordId.current)
-        .collection('medications')
+        .collection(MEDICATIONS_FOR_GROUP_COLLECTION)
+        .doc(groupId.current)
+        .collection(MEDICATIONS_SUBCOLLECTION)
         .doc(id)
         .delete();
 
@@ -83,6 +78,29 @@ function Medications({ navigation, showActionSheetWithOptions }) {
     }
   };
 
+  const handleCompleteMedication = async ({ id, name }) => {
+    // STOPHERE: implement completion
+    // await db
+    //   .collection('myMedRecords')
+    //   .doc(userUid)
+    //   .collection('records')
+    //   .doc(groupId.current)
+    //   .collection('medications')
+    //   .doc(id)
+    //   .add({
+    //     administeredBy: userUid,
+    //     dateTime: firestore.Timestamp.fromDate(new Date()),
+    //   });
+
+    Toast.show({
+      text: `${name} successfully marked as completed`,
+      buttonText: 'OK',
+      duration: 8000,
+      position: 'top',
+      type: 'success'
+    });
+  };
+
   const renderItem = value => {
     const { item } = value;
     return (
@@ -95,8 +113,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
             <Text>{`Note: ${item.note || ''}`}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-            {/* TODO: mark as completed */}
-            <Button rounded bordered onPress={() => console.log('TODO: mark as completed')}>
+            <Button rounded bordered onPress={() => handleCompleteMedication(item)}>
               <Icon name="checkmark-circle" />
             </Button>
             {/* TODO: list history */}
@@ -124,7 +141,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         keyExtractor={item => item.createdTimestamp.toString()}
         renderItem={renderItem}
       />
-      <Fab onPress={() => navigation.navigate('MedicationForm', { recordId: recordId.current })}>
+      <Fab onPress={() => navigation.navigate('MedicationForm', { groupId: groupId.current })}>
         <Icon name="add" />
       </Fab>
     </Container>
