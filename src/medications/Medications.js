@@ -4,14 +4,34 @@ import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
 import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import DateTimePicker from 'react-native-modal-datetime-picker';
 import { firestore } from 'firebase';
+import dayjs from 'dayjs';
 
 import { db } from '../db';
-import { Banner, MEDICATIONS_FOR_GROUP_COLLECTION, MEDICATIONS_SUBCOLLECTION } from '../common';
+import { Banner, MEDICATIONS_FOR_GROUP_COLLECTION, MEDICATIONS_SUBCOLLECTION, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION, uniqueId, USERS_COLLECTION } from '../common';
+
+const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
 
 function Medications({ navigation, showActionSheetWithOptions }) {
   const groupId = React.useRef(navigation.getParam('groupId'));
   const [medications, setMedications] = React.useState([]);
+  const [selectedMedication, setSelectedMedication] = React.useState(null);
+  const [isDateTimePickerVisible, setIsDateTimePickerVisible] = React.useState(false);
+  const administeredByRef = React.useRef({
+    docRef: db.collection(USERS_COLLECTION).doc(userUid),
+    name: null
+  });
+
+  const getAdministeredByName = async () => {
+    const current = administeredByRef.current;
+    if (!current.name) {
+      const user = await current.docRef.get();
+      current.name = user.data().name;
+    }
+
+    return current.name;
+  };
 
   const handleWillFocusScreen = async () => {
     const medicationsSnapshot = await db
@@ -72,33 +92,72 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         text: `${name} deleted successfully.`,
         buttonText: 'OK',
         duration: 8000,
-        position: 'top',
+        position: 'bottom',
         type: 'success'
       });
     }
   };
 
-  const handleCompleteMedication = async ({ id, name }) => {
-    // STOPHERE: implement completion
-    // await db
-    //   .collection('myMedRecords')
-    //   .doc(userUid)
-    //   .collection('records')
-    //   .doc(groupId.current)
-    //   .collection('medications')
-    //   .doc(id)
-    //   .add({
-    //     administeredBy: userUid,
-    //     dateTime: firestore.Timestamp.fromDate(new Date()),
-    //   });
+  const handleConfirmCompleteMedication = async date => {
+    setIsDateTimePickerVisible(false);
+    const { id, name } = selectedMedication;
+    const batch = db.batch();
+    const docRef = db.collection(MEDICATION_LOGS_COLLECTION).doc(id);
+    const docSnapshot = await docRef.get();
+    const administeredBy = await getAdministeredByName();
+    const log = {
+      administeredBy,
+      lastTakenDateTime: firestore.Timestamp.fromDate(date),
+    };
+
+    if (!docSnapshot.data()) {
+      // create a reference
+      batch.set(docRef, {
+        reference: db
+          .collection(MEDICATIONS_FOR_GROUP_COLLECTION)
+          .doc(groupId.current)
+          .collection(MEDICATIONS_SUBCOLLECTION)
+          .doc(id)
+      });
+    }
+
+    const logRef = docRef.collection(LOGS_SUBCOLLECTION).doc(uniqueId.newId());
+    batch.set(logRef, log);
+
+    // Update medication's latest log. This can also be done using data validation for atomic operations:
+    // https://firebase.google.com/docs/firestore/manage-data/transactions#data_validation_for_atomic_operations
+    const medsRef = db
+      .collection(MEDICATIONS_FOR_GROUP_COLLECTION)
+      .doc(groupId.current)
+      .collection(MEDICATIONS_SUBCOLLECTION)
+      .doc(id);
+    batch.update(medsRef, { currentLog: { ...log } });
+
+    await batch.commit();
+
+    const selectedMedicationIndex = medications.findIndex(m => m.id === id);
+    const medication = {
+      ...medications[selectedMedicationIndex],
+      currentLog: { ...log }
+    };
+    setMedications(medications => [
+      ...medications.slice(0, selectedMedicationIndex),
+      medication,
+      ...medications.slice(selectedMedicationIndex + 1)
+    ]);
 
     Toast.show({
       text: `${name} successfully marked as completed`,
       buttonText: 'OK',
       duration: 8000,
-      position: 'top',
+      position: 'bottom',
       type: 'success'
     });
+  };
+
+  const handleComplete = item => {
+    setSelectedMedication(item);
+    setIsDateTimePickerVisible(true);
   };
 
   const renderItem = value => {
@@ -108,15 +167,19 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         <Body>
           <View>
             <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-            <Text>{`Last taken date/time: ${item.lastTakenDateTime || ''}`}</Text>
-            <Text>{`Administered by: ${item.administeredBy || ''}`}</Text>
-            <Text>{`Note: ${item.note || ''}`}</Text>
+            {item.currentLog &&
+              <React.Fragment>
+                <Text>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
+                <Text>{`Administered by: ${item.currentLog.administeredBy}`}</Text>
+              </React.Fragment>
+            }
+            <Text>{`Note: ${item.note}`}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-            <Button rounded bordered onPress={() => handleCompleteMedication(item)}>
+            <Button rounded bordered onPress={() => handleComplete(item)}>
               <Icon name="checkmark-circle" />
             </Button>
-            {/* TODO: list history */}
+            {/* STOPHERE: list history */}
             <Button rounded bordered onPress={() => console.log('TODO: list history')}>
               <Icon name="list" />
             </Button>
@@ -140,6 +203,15 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         data={medications}
         keyExtractor={item => item.createdTimestamp.toString()}
         renderItem={renderItem}
+      />
+      <DateTimePicker
+        mode="datetime"
+        titleIOS={selectedMedication && `${selectedMedication.name} - Date and time of administration`}
+        date={new Date()}
+        is24Hour={false}
+        isVisible={isDateTimePickerVisible}
+        onConfirm={handleConfirmCompleteMedication}
+        onCancel={() => setIsDateTimePickerVisible(false)}
       />
       <Fab onPress={() => navigation.navigate('MedicationForm', { groupId: groupId.current })}>
         <Icon name="add" />

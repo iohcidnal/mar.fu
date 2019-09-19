@@ -16,7 +16,7 @@ export default function useSubmit(submitAsync, successMessage) {
             text: successMessage,
             buttonText: 'OK',
             duration: 8000,
-            position: 'top',
+            position: 'bottom',
             type: 'success'
           });
         } catch (error) {
@@ -24,7 +24,7 @@ export default function useSubmit(submitAsync, successMessage) {
             text: error.message,
             buttonText: 'OK',
             duration: 8000,
-            position: 'top',
+            position: 'bottom',
             type: 'danger',
           });
         } finally {

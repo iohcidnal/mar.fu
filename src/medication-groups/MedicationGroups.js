@@ -32,10 +32,10 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
     setIsFetching(false);
   };
 
-  const handleViewMedications = ({ id: groupId, name }) => {
+  const handleViewMedications = ({ id: groupId, name: medicationTitle }) => {
     navigation.navigate('Medications', {
       groupId,
-      medicationTitle: `${name} Medications`
+      medicationTitle
     });
   };
 
@@ -84,7 +84,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
         text: `${name} deleted successfully.`,
         buttonText: 'OK',
         duration: 8000,
-        position: 'top',
+        position: 'bottom',
         type: 'success'
       });
     }
