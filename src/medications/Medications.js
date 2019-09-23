@@ -50,6 +50,11 @@ function Medications({ navigation, showActionSheetWithOptions }) {
     setMedications(medications);
   };
 
+  const handleComplete = item => {
+    setSelectedMedication(item);
+    setIsDateTimePickerVisible(true);
+  };
+
   const handleEdit = item => {
     navigation.navigate('MedicationForm', {
       initialState: { ...item },
@@ -155,11 +160,6 @@ function Medications({ navigation, showActionSheetWithOptions }) {
     });
   };
 
-  const handleComplete = item => {
-    setSelectedMedication(item);
-    setIsDateTimePickerVisible(true);
-  };
-
   const renderItem = value => {
     const { item } = value;
     return (
@@ -179,8 +179,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
             <Button rounded bordered onPress={() => handleComplete(item)}>
               <Icon name="checkmark-circle" />
             </Button>
-            {/* STOPHERE: list history */}
-            <Button rounded bordered onPress={() => console.log('TODO: list history')}>
+            <Button rounded bordered onPress={() => navigation.navigate('MedicationLogs', { medicationId: item.id, medicationName: item.name })}>
               <Icon name="list" />
             </Button>
             <Button rounded bordered onPress={() => handleEdit(item)}>
