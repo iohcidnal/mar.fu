@@ -2,18 +2,28 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
-import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast } from 'native-base';
+import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast, Spinner } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { firestore } from 'firebase';
 import dayjs from 'dayjs';
 
 import { db } from '../db';
-import { Banner, MEDICATIONS_FOR_GROUP_COLLECTION, MEDICATIONS_SUBCOLLECTION, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION, uniqueId, USERS_COLLECTION } from '../common';
+import {
+  useCollection,
+  Banner,
+  MEDICATIONS_FOR_GROUP_COLLECTION,
+  MEDICATIONS_SUBCOLLECTION,
+  MEDICATION_LOGS_COLLECTION,
+  LOGS_SUBCOLLECTION,
+  uniqueId,
+  USERS_COLLECTION
+} from '../common';
 
 const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
 
 function Medications({ navigation, showActionSheetWithOptions }) {
+  const { getCollection, isBusy, data } = useCollection();
   const groupId = React.useRef(navigation.getParam('groupId'));
   const [medications, setMedications] = React.useState([]);
   const [selectedMedication, setSelectedMedication] = React.useState(null);
@@ -22,6 +32,20 @@ function Medications({ navigation, showActionSheetWithOptions }) {
     docRef: db.collection(USERS_COLLECTION).doc(userUid),
     name: null
   });
+
+  React.useEffect(
+    () => {
+      const medications = data.reduce(
+        (acc, med) => {
+          acc.push({ id: med.id, ...med.data() });
+          return acc;
+        },
+        []
+      );
+      setMedications(medications);
+    },
+    [data]
+  );
 
   const getAdministeredByName = async () => {
     const current = administeredByRef.current;
@@ -34,20 +58,11 @@ function Medications({ navigation, showActionSheetWithOptions }) {
   };
 
   const handleWillFocusScreen = async () => {
-    const medicationsSnapshot = await db
-      .collection(MEDICATIONS_FOR_GROUP_COLLECTION)
-      .doc(groupId.current)
-      .collection(MEDICATIONS_SUBCOLLECTION)
-      .orderBy('name')
-      .get();
-    const medications = medicationsSnapshot.docs.reduce(
-      (acc, med) => {
-        acc.push({ id: med.id, ...med.data() });
-        return acc;
-      },
-      []
-    );
-    setMedications(medications);
+    const config = {
+      ref: `${MEDICATIONS_FOR_GROUP_COLLECTION}/${groupId.current}/${MEDICATIONS_SUBCOLLECTION}`,
+      orderBy: 'name'
+    };
+    getCollection(config);
   };
 
   const handleComplete = item => {
@@ -197,7 +212,8 @@ function Medications({ navigation, showActionSheetWithOptions }) {
   return (
     <Container>
       <NavigationEvents onWillFocus={handleWillFocusScreen} />
-      {medications.length === 0 && <Banner iconName="sad" description="You don't have medications at the moment. Please create a new one." />}
+      {isBusy && <Spinner />}
+      {!isBusy && medications.length === 0 && <Banner iconName="sad" description="You don't have medications at the moment. Please create a new one." />}
       <FlatList
         data={medications}
         keyExtractor={item => item.createdTimestamp.toString()}

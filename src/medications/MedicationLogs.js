@@ -1,43 +1,38 @@
 import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
-import { ListItem, Body, Text, Container } from 'native-base';
+import { ListItem, Body, Text, Container, Spinner } from 'native-base';
 
-import { db } from '../db';
-import { MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION } from '../common';
+import { useCollection, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION } from '../common';
 import dayjs from 'dayjs';
 
 export default function MedicationLogs({ navigation }) {
   const medicationId = React.useRef(navigation.getParam('medicationId'));
-  const [medicationLogs, setMedicationLogs] = React.useState([]);
+  // STOPHERE: Debug to see why this is not working:
+  const { isBusy, data } = useCollection({
+    ref: `${MEDICATION_LOGS_COLLECTION}/${medicationId.current}/${LOGS_SUBCOLLECTION}`,
+    orderBy: 'lastTakenDateTime, desc'
+  });
+  const [medicationLogs, setMedicationLogs] = React.useState(data);
 
   React.useEffect(
     () => {
-      getLogs();
-
-      async function getLogs() {
-        const logs = await db
-          .collection(MEDICATION_LOGS_COLLECTION)
-          .doc(medicationId.current)
-          .collection(LOGS_SUBCOLLECTION)
-          .orderBy('lastTakenDateTime', 'desc')
-          .get();
-        const result = logs.docs.reduce(
-          (acc, log) => {
-            const data = log.data();
-            acc.push({
-              id: log.id,
-              lastTakenDateTime: dayjs(data.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A'),
-              administeredBy: data.administeredBy
-            });
-            return acc;
-          },
-          []
-        );
-        setMedicationLogs(result);
-      }
+      console.log(data);
+      const result = data.reduce(
+        (acc, log) => {
+          const data = log.data();
+          acc.push({
+            id: log.id,
+            lastTakenDateTime: dayjs(data.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A'),
+            administeredBy: data.administeredBy
+          });
+          return acc;
+        },
+        []
+      );
+      setMedicationLogs(result);
     },
-    []
+    [data]
   );
 
   const renderItem = value => {
@@ -56,6 +51,7 @@ export default function MedicationLogs({ navigation }) {
 
   return (
     <Container>
+      {isBusy && <Spinner />}
       <FlatList
         data={medicationLogs}
         keyExtractor={item => item.id}

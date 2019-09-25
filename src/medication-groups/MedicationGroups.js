@@ -5,31 +5,35 @@ import { NavigationEvents } from 'react-navigation';
 import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-import { Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
+import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
 import { db } from '../db';
 
 const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
+  const { getCollection, isBusy, data } = useCollection();
   const [medicationGroups, setMedicationGroups] = React.useState([]);
-  const [isFetching, setIsFetching] = React.useState(true);
 
-  const handleWillFocusScreen = async () => {
-    const records = await db
-      .collection(GROUPS_FOR_USER_COLLECTION)
-      .doc(userUid)
-      .collection(GROUPS_SUBCOLLECTION)
-      .orderBy('name')
-      .get();
-    const result = records.docs.reduce(
-      (acc, record) => {
-        acc.push({ id: record.id, ...record.data() });
-        return acc;
-      },
-      []
-    );
-    setMedicationGroups(result);
-    setIsFetching(false);
+  React.useEffect(
+    () => {
+      const medicationGroups = data.reduce(
+        (acc, record) => {
+          acc.push({ id: record.id, ...record.data() });
+          return acc;
+        },
+        []
+      );
+      setMedicationGroups(medicationGroups);
+    },
+    [data]
+  );
+
+  const handleWillFocusScreen = () => {
+    const config = {
+      ref: `${GROUPS_FOR_USER_COLLECTION}/${userUid}/${GROUPS_SUBCOLLECTION}`,
+      orderBy: 'name'
+    };
+    getCollection(config);
   };
 
   const handleViewMedications = ({ id: groupId, name: medicationTitle }) => {
@@ -118,8 +122,8 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
   return (
     <Container>
       <NavigationEvents onWillFocus={handleWillFocusScreen} />
-      {isFetching && <Spinner />}
-      {!isFetching && medicationGroups.length === 0 && <Banner iconName="sad" description="You don't have any medication groups at the moment. Please create a new one." />}
+      {isBusy && <Spinner />}
+      {!isBusy && medicationGroups.length === 0 && <Banner iconName="sad" description="You don't have any medication groups at the moment. Please create a new one." />}
       <FlatList
         data={medicationGroups}
         keyExtractor={item => item.id}
