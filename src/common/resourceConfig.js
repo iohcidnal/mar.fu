@@ -1,4 +1,5 @@
 export default {
   ref: null,
-  orderBy: null
+  orderBy: null,
+  isDescending: false,
 };

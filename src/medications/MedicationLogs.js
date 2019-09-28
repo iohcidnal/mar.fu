@@ -8,16 +8,15 @@ import dayjs from 'dayjs';
 
 export default function MedicationLogs({ navigation }) {
   const medicationId = React.useRef(navigation.getParam('medicationId'));
-  // STOPHERE: Debug to see why this is not working:
   const { isBusy, data } = useCollection({
     ref: `${MEDICATION_LOGS_COLLECTION}/${medicationId.current}/${LOGS_SUBCOLLECTION}`,
-    orderBy: 'lastTakenDateTime, desc'
+    orderBy: 'lastTakenDateTime',
+    isDescending: true
   });
   const [medicationLogs, setMedicationLogs] = React.useState(data);
 
   React.useEffect(
     () => {
-      console.log(data);
       const result = data.reduce(
         (acc, log) => {
           const data = log.data();

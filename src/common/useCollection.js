@@ -10,7 +10,7 @@ export default function useCollection(initialResourceConfig = resourceConfig) {
 
   React.useEffect(
     () => {
-      const { ref, orderBy } = config;
+      const { ref, orderBy, isDescending } = config;
       if (!ref) return;
       getCollection();
 
@@ -19,7 +19,7 @@ export default function useCollection(initialResourceConfig = resourceConfig) {
 
         const querySnapshot = await db
           .collection(ref)
-          .orderBy(orderBy)
+          .orderBy(orderBy, isDescending && 'desc')
           .get();
 
         setData(querySnapshot.docs);
