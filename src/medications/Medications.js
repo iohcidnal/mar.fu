@@ -20,7 +20,7 @@ import {
   USERS_COLLECTION
 } from '../common';
 
-const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
 
 function Medications({ navigation, showActionSheetWithOptions }) {
   const { getCollection, isBusy, data } = useCollection();

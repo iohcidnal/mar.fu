@@ -2,9 +2,21 @@ import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { Container, Form } from 'native-base';
-import firebase from 'firebase';
 
-import { Banner, Textbox, useHandleChangeText, useSubmit, doesExist, useValidation, Button, MEDICATIONS_FOR_GROUP_COLLECTION, MEDICATIONS_SUBCOLLECTION, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
+import {
+  Banner,
+  Textbox,
+  useDocument,
+  useHandleChangeText,
+  useSubmit,
+  doesExist,
+  useValidation,
+  Button,
+  MEDICATIONS_FOR_GROUP_COLLECTION,
+  MEDICATIONS_SUBCOLLECTION,
+  GROUPS_FOR_USER_COLLECTION,
+  GROUPS_SUBCOLLECTION
+} from '../common';
 import { db } from '../db';
 
 const initialState = {
@@ -14,44 +26,44 @@ const initialState = {
   note: ''
 };
 
-const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
 
 export default function MedicationForm({ navigation }) {
   const groupId = React.useRef(navigation.getParam('groupId'));
+  const { docRef, getDocument, updateDocument, addDocument, isSubmitting } = useDocument();
+  const { docRef: groupRef } = useDocument(`${GROUPS_FOR_USER_COLLECTION}/${userUid}/${GROUPS_SUBCOLLECTION}/${groupId.current}`);
   const [state, handleChangeText] = useHandleChangeText(navigation.getParam('initialState', initialState));
-  const [isSubmitting, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Medication updated' : 'New medication created'} successfully.`);
+  const [, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Medication updated' : 'New medication created'} successfully.`);
   const [validate, validationError] = useValidation(() => validateForm());
 
-  async function saveForm() {
+  React.useEffect(
+    () => {
+      if (!docRef) return;
+      saveFormAsync();
+
+      async function saveFormAsync() {
+        const docSnapshot = await docRef.get();
+        if (!docSnapshot.data()) {
+          // create a reference
+          await updateDocument(undefined, { reference: groupRef }, false);
+        }
+
+        const { id, ...medication } = state;
+        if (id) {
+          await updateDocument(`${MEDICATIONS_SUBCOLLECTION}/${id}`, medication);
+        } else {
+          await addDocument(MEDICATIONS_SUBCOLLECTION, medication);
+        }
+
+        navigation.goBack();
+      }
+    },
+    [addDocument, docRef, groupRef, navigation, state, updateDocument]
+  );
+
+  function saveForm() {
     validate();
-
-    const docRef = db.collection(MEDICATIONS_FOR_GROUP_COLLECTION).doc(groupId.current);
-    const docSnapshot = await docRef.get();
-    if (!docSnapshot.data()) {
-      // create a reference
-      await docRef.set({
-        reference: db
-          .collection(GROUPS_FOR_USER_COLLECTION)
-          .doc(userUid)
-          .collection(GROUPS_SUBCOLLECTION)
-          .doc(groupId.current)
-      });
-    }
-
-    if (state.id) {
-      const { id, ...medication } = state;
-      await docRef.collection(MEDICATIONS_SUBCOLLECTION)
-        .doc(id)
-        .set({ ...medication }, { merge: true });
-    } else {
-      await docRef.collection(MEDICATIONS_SUBCOLLECTION)
-        .add({
-          ...state,
-          createdTimestamp: firebase.firestore.Timestamp.fromDate(new Date())
-        });
-    }
-
-    navigation.goBack();
+    getDocument(`${MEDICATIONS_FOR_GROUP_COLLECTION}/${groupId.current}`);
   }
 
   function validateForm() {

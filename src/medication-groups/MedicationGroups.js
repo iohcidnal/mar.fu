@@ -8,7 +8,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
 import { db } from '../db';
 
-const userUid = 'BaRGu3BEyBf1jz4OlfYHIxZ6Oqs1'; // TODO: get this from auth's current user
+const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
   const { getCollection, isBusy, data } = useCollection();

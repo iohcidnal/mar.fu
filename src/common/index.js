@@ -16,3 +16,4 @@ export { default as Button } from './Button';
 export { default as Textbox } from './Textbox';
 export { default as useValidation } from './useValidation';
 export { default as useCollection } from './useCollection';
+export { default as useDocument } from './useDocument';
