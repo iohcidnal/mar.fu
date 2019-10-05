@@ -1,9 +1,13 @@
 import React from 'react';
-
 import { db } from '../db';
-import resourceConfig from './resourceConfig';
 
-export default function useCollection(initialResourceConfig = resourceConfig) {
+const initialConfig = {
+  ref: null,
+  orderBy: null,
+  isDescending: false,
+};
+
+export default function useCollection(initialResourceConfig = initialConfig) {
   const [config, setConfig] = React.useState(initialResourceConfig);
   const [isBusy, setIsBusy] = React.useState(false);
   const [data, setData] = React.useState([]);
