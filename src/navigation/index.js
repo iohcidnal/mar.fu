@@ -3,12 +3,12 @@ import { createStackNavigator, createAppContainer, createSwitchNavigator } from 
 import NavigationLoader from './NavigationLoader';
 import Login from '../login';
 import SignUp from '../sign-up';
-import { MedicationGroups, MedicationGroupForm } from '../medication-groups';
+import { MedicationGroups, MedicationGroupForm, MedicationGroupShare } from '../medication-groups';
 import { Medications, MedicationForm, MedicationLogs } from '../medications';
 
 const LoginNavigator = createStackNavigator({ Login });
 const SignUpNavigator = createStackNavigator({ SignUp });
-const MedicationGroupsNavigator = createStackNavigator({ MedicationGroups, MedicationGroupForm, Medications, MedicationForm, MedicationLogs });
+const MedicationGroupsNavigator = createStackNavigator({ MedicationGroups, MedicationGroupForm, MedicationGroupShare, Medications, MedicationForm, MedicationLogs });
 
 export default createAppContainer(
   createSwitchNavigator(

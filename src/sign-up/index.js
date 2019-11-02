@@ -36,6 +36,7 @@ export default function SignUp({ navigation }) {
     validate();
 
     const userCredential = await auth.createUserWithEmailAndPassword(state.emailAddress, state.password);
+    // TODO: Refactor creating new user to use `useDocument`
     await db
       .collection('users')
       .doc(userCredential.user.uid)
@@ -43,8 +44,8 @@ export default function SignUp({ navigation }) {
         {
           uid: userCredential.user.uid,
           name: state.name,
-          memberOfUid: null,
-          lowerCaseName: state.name.toLowerCase()
+          lowerCaseName: state.name.toLowerCase(),
+          emailAddress: state.emailAddress.toLowerCase(),
         },
         { merge: true }
       );

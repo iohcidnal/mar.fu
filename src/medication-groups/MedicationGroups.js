@@ -43,6 +43,13 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
     });
   };
 
+  // const handleShare = ({ id: groupId, name: groupName }) => {
+  //   navigation.navigate('MedicationGroupShare', {
+  //     groupId,
+  //     groupName
+  //   });
+  // };
+
   const handleEdit = ({ id, name, description }) => {
     navigation.navigate('MedicationGroupForm', {
       initialState: {
@@ -104,9 +111,9 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
             <Text>{item.description}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-            <Button rounded bordered onPress={() => console.log('TODO: share')}>
+            {/* <Button rounded bordered onPress={() => handleShare(item)}>
               <Icon name="share" />
-            </Button>
+            </Button> */}
             <Button rounded bordered onPress={() => handleEdit(item)}>
               <Icon name="create" />
             </Button>

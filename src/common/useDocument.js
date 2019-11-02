@@ -22,10 +22,10 @@ export default function useDocument(initialDocumentPath) {
   );
 
   const updateDocument = React.useCallback(
-    async (subDocumentPath = '', payload, shouldMerge = true) => {
+    async (subDocumentPath = '', payload, shouldMerge = true, docPath = documentPath) => {
       setIsSubmitting(true);
       await db
-        .doc(`${documentPath}/${subDocumentPath}`)
+        .doc(`${docPath}/${subDocumentPath}`)
         .set(payload, { merge: shouldMerge });
       setIsSubmitting(false);
     },
@@ -33,10 +33,10 @@ export default function useDocument(initialDocumentPath) {
   );
 
   const addDocument = React.useCallback(
-    async (collectionPath = '', payload) => {
+    async (collectionPath = '', payload, docPath = documentPath) => {
       setIsSubmitting(true);
       await db
-        .collection(`${documentPath}/${collectionPath}`)
+        .collection(`${docPath}/${collectionPath}`)
         .add({
           ...payload,
           createdTimestamp: firebase.firestore.Timestamp.fromDate(new Date())

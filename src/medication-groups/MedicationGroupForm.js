@@ -48,10 +48,7 @@ export default function MedicationGroupForm({ navigation }) {
         if (id) {
           await updateDocument(`${GROUPS_SUBCOLLECTION}/${id}`, group);
         } else {
-          await addDocument(GROUPS_SUBCOLLECTION, {
-            ...group,
-            sharedWith: [],
-          });
+          await addDocument(GROUPS_SUBCOLLECTION, { ...group });
         }
 
         navigation.goBack();
