@@ -8,6 +8,8 @@ import { Root } from 'native-base';
 
 import AppNavigation from './src/navigation';
 
+console.disableYellowBox = true;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

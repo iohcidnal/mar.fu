@@ -6,9 +6,7 @@ import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast } fr
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
 import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
-import { db } from '../db';
-
-const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
+import { db, auth } from '../db';
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
   const { getCollection, isBusy, data } = useCollection();
@@ -30,7 +28,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
 
   const handleWillFocusScreen = () => {
     const config = {
-      ref: `${GROUPS_FOR_USER_COLLECTION}/${userUid}/${GROUPS_SUBCOLLECTION}`,
+      ref: `${GROUPS_FOR_USER_COLLECTION}/${auth.currentUser.uid}/${GROUPS_SUBCOLLECTION}`,
       orderBy: 'name'
     };
     getCollection(config);
@@ -78,7 +76,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
     async function deleteRecordAsync() {
       await db
         .collection(GROUPS_FOR_USER_COLLECTION)
-        .doc(userUid)
+        .doc(auth.currentUser.uid)
         .collection(GROUPS_SUBCOLLECTION)
         .doc(id)
         .delete();

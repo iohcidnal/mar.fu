@@ -16,18 +16,17 @@ import {
   GROUPS_SUBCOLLECTION,
   USERS_COLLECTION
 } from '../common';
-import { auth, db } from '../db';
+import { auth } from '../db';
 
 const initialState = {
   name: '',
   description: ''
 };
 
-const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
 
 export default function MedicationGroupForm({ navigation }) {
   const { docRef, getDocument, updateDocument, addDocument, isSubmitting } = useDocument();
-  const { docRef: userRef } = useDocument(`${USERS_COLLECTION}/${userUid}`);
+  const { docRef: userRef } = useDocument(`${USERS_COLLECTION}/${auth.currentUser.uid}`);
   const [state, handleChangeText] = useHandleChangeText(navigation.getParam('initialState', initialState));
   const [, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Medication group updated' : 'New medication group created'} successfully.`);
   const [validate, validationError] = useValidation(() => validateForm());
@@ -59,7 +58,7 @@ export default function MedicationGroupForm({ navigation }) {
 
   function saveForm() {
     validate();
-    getDocument(`${GROUPS_FOR_USER_COLLECTION}/${userUid}`);
+    getDocument(`${GROUPS_FOR_USER_COLLECTION}/${auth.currentUser.uid}`);
   }
 
   function validateForm() {

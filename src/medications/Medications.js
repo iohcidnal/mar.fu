@@ -8,7 +8,7 @@ import DateTimePicker from 'react-native-modal-datetime-picker';
 import { firestore } from 'firebase';
 import dayjs from 'dayjs';
 
-import { db } from '../db';
+import { db, auth } from '../db';
 import {
   useCollection,
   Banner,
@@ -20,8 +20,6 @@ import {
   USERS_COLLECTION
 } from '../common';
 
-const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
-
 function Medications({ navigation, showActionSheetWithOptions }) {
   const { getCollection, isBusy, data } = useCollection();
   const groupId = React.useRef(navigation.getParam('groupId'));
@@ -29,7 +27,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
   const [selectedMedication, setSelectedMedication] = React.useState(null);
   const [isDateTimePickerVisible, setIsDateTimePickerVisible] = React.useState(false);
   const administeredByRef = React.useRef({
-    docRef: db.collection(USERS_COLLECTION).doc(userUid),
+    docRef: db.collection(USERS_COLLECTION).doc(auth.currentUser.uid),
     name: null
   });
 

@@ -37,8 +37,7 @@ export default function Login({ navigation }) {
 
   async function loginAsync() {
     await auth.signInWithEmailAndPassword(state.emailAddress, state.password);
-    console.log('login success!');
-    // STOPHERE: navigate to family member screen
+    navigation.navigate('MedicationGroups');
   }
 
   return (

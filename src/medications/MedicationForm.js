@@ -17,7 +17,7 @@ import {
   GROUPS_FOR_USER_COLLECTION,
   GROUPS_SUBCOLLECTION
 } from '../common';
-import { db } from '../db';
+import { auth } from '../db';
 
 const initialState = {
   name: '',
@@ -26,12 +26,10 @@ const initialState = {
   note: ''
 };
 
-const userUid = 'yMZNNavHRJfVDlaTvfYdYpOncZB3'; // TODO: get this from auth's current user
-
 export default function MedicationForm({ navigation }) {
   const groupId = React.useRef(navigation.getParam('groupId'));
   const { docRef, getDocument, updateDocument, addDocument, isSubmitting } = useDocument();
-  const { docRef: groupRef } = useDocument(`${GROUPS_FOR_USER_COLLECTION}/${userUid}/${GROUPS_SUBCOLLECTION}/${groupId.current}`);
+  const { docRef: groupRef } = useDocument(`${GROUPS_FOR_USER_COLLECTION}/${auth.currentUser.uid}/${GROUPS_SUBCOLLECTION}/${groupId.current}`);
   const [state, handleChangeText] = useHandleChangeText(navigation.getParam('initialState', initialState));
   const [, handleSubmit] = useSubmit(saveForm, `${state.id ? 'Medication updated' : 'New medication created'} successfully.`);
   const [validate, validationError] = useValidation(() => validateForm());
