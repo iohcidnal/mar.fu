@@ -138,7 +138,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
-      <Fab navigation={navigation} onAdd={() => navigation.navigate('MedicationGroupForm')} />
+      <Fab onAdd={() => navigation.navigate('MedicationGroupForm')} />
     </Container>
   );
 }

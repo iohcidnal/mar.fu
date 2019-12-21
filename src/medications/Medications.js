@@ -231,7 +231,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         onConfirm={handleConfirmCompleteMedication}
         onCancel={() => setIsDateTimePickerVisible(false)}
       />
-      <Fab navigation={navigation} onAdd={() => navigation.navigate('MedicationForm', { groupId: groupId.current })} />
+      <Fab onAdd={() => navigation.navigate('MedicationForm', { groupId: groupId.current })} />
     </Container>
   );
 }

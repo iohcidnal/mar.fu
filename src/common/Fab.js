@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Fab as FabNativeBase, Icon, Button } from 'native-base';
+import { withNavigation } from 'react-navigation';
 
 import { auth } from '../db';
 
-export default function Fab({ navigation, onAdd }) {
+function Fab({ navigation, onAdd }) {
   const [isActive, setIsActive] = React.useState(false);
 
   const handleLogOut = async () => {
@@ -33,3 +34,5 @@ Fab.propTypes = {
   navigation: PropTypes.object.isRequired,
   onAdd: PropTypes.func.isRequired
 };
+
+export default withNavigation(Fab);
