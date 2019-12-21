@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
-import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast, Spinner, Right } from 'native-base';
+import { Container, Icon, ListItem, Body, Button, Text, Toast, Spinner, Right } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { firestore } from 'firebase';
@@ -12,6 +12,7 @@ import { db, auth } from '../db';
 import {
   useCollection,
   Banner,
+  Fab,
   MEDICATIONS_FOR_GROUP_COLLECTION,
   MEDICATIONS_SUBCOLLECTION,
   MEDICATION_LOGS_COLLECTION,
@@ -230,9 +231,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
         onConfirm={handleConfirmCompleteMedication}
         onCancel={() => setIsDateTimePickerVisible(false)}
       />
-      <Fab onPress={() => navigation.navigate('MedicationForm', { groupId: groupId.current })}>
-        <Icon name="add" />
-      </Fab>
+      <Fab navigation={navigation} onAdd={() => navigation.navigate('MedicationForm', { groupId: groupId.current })} />
     </Container>
   );
 }

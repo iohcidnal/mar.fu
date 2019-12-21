@@ -24,6 +24,8 @@ const styles = {
     marginTop: 20,
     fontSize: 14,
     color: '#FFF',
+    paddingLeft: 10,
+    paddingRight: 10,
   },
 };
 

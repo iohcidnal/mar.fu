@@ -2,10 +2,10 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
-import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast, Right } from 'native-base';
+import { Container, Icon, ListItem, Button, Body, Text, Spinner, Toast, Right } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, duration } from '../common';
+import { useCollection, Banner, Fab, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, duration } from '../common';
 import { db, auth } from '../db';
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
@@ -138,9 +138,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
-      <Fab onPress={() => navigation.navigate('MedicationGroupForm')}>
-        <Icon name="add" />
-      </Fab>
+      <Fab navigation={navigation} onAdd={() => navigation.navigate('MedicationGroupForm')} />
     </Container>
   );
 }
