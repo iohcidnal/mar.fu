@@ -1,6 +1,8 @@
 import React from 'react';
 import { Toast } from 'native-base';
 
+import { duration } from '.';
+
 export default function useSubmit(submitAsync, successMessage) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -15,7 +17,7 @@ export default function useSubmit(submitAsync, successMessage) {
           successMessage && Toast.show({
             text: successMessage,
             buttonText: 'OK',
-            duration: 8000,
+            duration,
             position: 'bottom',
             type: 'success'
           });
@@ -23,7 +25,7 @@ export default function useSubmit(submitAsync, successMessage) {
           Toast.show({
             text: error.message,
             buttonText: 'OK',
-            duration: 8000,
+            duration,
             position: 'bottom',
             type: 'danger',
           });

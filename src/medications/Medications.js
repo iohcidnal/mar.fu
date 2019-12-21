@@ -2,7 +2,7 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
-import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast, Spinner } from 'native-base';
+import { Container, Fab, Icon, ListItem, Body, Button, Text, Toast, Spinner, Right } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import { firestore } from 'firebase';
@@ -17,7 +17,8 @@ import {
   MEDICATION_LOGS_COLLECTION,
   LOGS_SUBCOLLECTION,
   uniqueId,
-  USERS_COLLECTION
+  USERS_COLLECTION,
+  duration
 } from '../common';
 
 function Medications({ navigation, showActionSheetWithOptions }) {
@@ -61,6 +62,10 @@ function Medications({ navigation, showActionSheetWithOptions }) {
       orderBy: 'name'
     };
     getCollection(config);
+  };
+
+  const handleViewMedicationLogs = ({ id: medicationId, name: medicationName }) => {
+    navigation.navigate('MedicationLogs', { medicationId, medicationName });
   };
 
   const handleComplete = item => {
@@ -109,7 +114,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
       Toast.show({
         text: `${name} deleted successfully.`,
         buttonText: 'OK',
-        duration: 8000,
+        duration,
         position: 'bottom',
         type: 'success'
       });
@@ -167,7 +172,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
     Toast.show({
       text: `${name} successfully marked as completed`,
       buttonText: 'OK',
-      duration: 8000,
+      duration,
       position: 'bottom',
       type: 'success'
     });
@@ -176,33 +181,32 @@ function Medications({ navigation, showActionSheetWithOptions }) {
   const renderItem = value => {
     const { item } = value;
     return (
-      <ListItem>
+      <ListItem onPress={() => handleViewMedicationLogs(item)}>
         <Body>
           <View>
-            <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
+            <Text>{item.name}</Text>
             {item.currentLog &&
               <React.Fragment>
-                <Text>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
-                <Text>{`Administered by: ${item.currentLog.administeredBy}`}</Text>
+                <Text style={{ color: 'gray' }}>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
               </React.Fragment>
             }
-            <Text>{`Note: ${item.note}`}</Text>
+            <Text style={{ color: 'gray' }}>{`Note: ${item.note}`}</Text>
           </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-            <Button rounded bordered onPress={() => handleComplete(item)}>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
+            <Button transparent onPress={() => handleComplete(item)}>
               <Icon name="checkmark-circle" />
             </Button>
-            <Button rounded bordered onPress={() => navigation.navigate('MedicationLogs', { medicationId: item.id, medicationName: item.name })}>
-              <Icon name="list" />
-            </Button>
-            <Button rounded bordered onPress={() => handleEdit(item)}>
+            <Button transparent onPress={() => handleEdit(item)}>
               <Icon name="create" />
             </Button>
-            <Button rounded bordered onPress={() => handleDelete(item)}>
+            <Button transparent onPress={() => handleDelete(item)}>
               <Icon name="trash" />
             </Button>
           </View>
         </Body>
+        <Right>
+          <Icon name="arrow-forward" />
+        </Right>
       </ListItem>
     );
   };

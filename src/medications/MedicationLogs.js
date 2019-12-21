@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
-import { ListItem, Body, Text, Container, Spinner } from 'native-base';
+import { ListItem, Body, Text, Container, Spinner, Icon } from 'native-base';
 
-import { useCollection, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION } from '../common';
+import { useCollection, Banner, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION } from '../common';
 import dayjs from 'dayjs';
 
 export default function MedicationLogs({ navigation }) {
@@ -39,10 +39,11 @@ export default function MedicationLogs({ navigation }) {
     return (
       <ListItem>
         <Body>
-          <View>
-            <Text>{`Completed on: ${item.lastTakenDateTime}`}</Text>
-            <Text>{`Administered by: ${item.administeredBy}`}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <Icon style={{ color: 'gray' }} name="checkmark-circle" />
+            <Text>{item.lastTakenDateTime}</Text>
           </View>
+          {/* <Text>{`Administered by: ${item.administeredBy}`}</Text> */}
         </Body>
       </ListItem>
     );
@@ -51,6 +52,7 @@ export default function MedicationLogs({ navigation }) {
   return (
     <Container>
       {isBusy && <Spinner />}
+      {!isBusy && medicationLogs.length === 0 && <Banner iconName="sad" description="No records showing that you've taken this medication." />}
       <FlatList
         data={medicationLogs}
         keyExtractor={item => item.id}
@@ -61,7 +63,7 @@ export default function MedicationLogs({ navigation }) {
 }
 
 MedicationLogs.navigationOptions = ({ navigation }) => ({
-  title: `${navigation.getParam('medicationName', 'Medication')} Logs`
+  title: `${navigation.getParam('medicationName', 'Medication')} - Dates Taken`
 });
 
 MedicationLogs.propTypes = {

@@ -7,6 +7,7 @@ export const MEDICATION_LOGS_COLLECTION = 'medication-logs';
 export const LOGS_SUBCOLLECTION = 'logs';
 export const GROUP_SHARING_FOR_USER = 'group-sharing-for-user';
 export const SHARED_GROUPS_SUBCOLLECTION = 'shared-groups';
+export const duration = 3000;
 
 export { default as uniqueId } from './uniqueId';
 export { default as useHandleChangeText } from './useHandleChangeText';

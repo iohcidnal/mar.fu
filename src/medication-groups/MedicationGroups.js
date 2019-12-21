@@ -2,10 +2,10 @@ import React from 'react';
 import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { NavigationEvents } from 'react-navigation';
-import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast } from 'native-base';
+import { Container, Fab, Icon, ListItem, Button, Body, Text, Spinner, Toast, Right } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION } from '../common';
+import { useCollection, Banner, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, duration } from '../common';
 import { db, auth } from '../db';
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
@@ -92,7 +92,7 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
       Toast.show({
         text: `${name} deleted successfully.`,
         buttonText: 'OK',
-        duration: 8000,
+        duration,
         position: 'bottom',
         type: 'success'
       });
@@ -104,22 +104,26 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
     return (
       <ListItem onPress={() => handleViewMedications(item)}>
         <Body>
-          <View>
-            <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-            <Text>{item.description}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 20 }}>
-            {/* <Button rounded bordered onPress={() => handleShare(item)}>
+          <Text>{item.name}</Text>
+          <Text style={{ color: 'gray' }}>{item.description}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
+            {/* 
+            Sharing will be in a future version
+            <Button rounded bordered onPress={() => handleShare(item)}>
               <Icon name="share" />
-            </Button> */}
-            <Button rounded bordered onPress={() => handleEdit(item)}>
+            </Button> 
+            */}
+            <Button transparent onPress={() => handleEdit(item)}>
               <Icon name="create" />
             </Button>
-            <Button rounded bordered onPress={() => handleDelete(item)}>
+            <Button transparent onPress={() => handleDelete(item)}>
               <Icon name="trash" />
             </Button>
           </View>
         </Body>
+        <Right>
+          <Icon name="arrow-forward" />
+        </Right>
       </ListItem>
     );
   };

@@ -77,6 +77,8 @@ export default function MedicationForm({ navigation }) {
       <Banner title={`${state.id ? 'Update' : 'New'} Medication`} />
       <Form>
         <Textbox
+          iconName="pill"
+          iconType="MaterialCommunityIcons"
           placeholder="Name"
           autoCapitalize="words"
           value={state.name}
@@ -84,18 +86,24 @@ export default function MedicationForm({ navigation }) {
           errorMessage={validationError.name}
         />
         <Textbox
+          iconName="counter"
+          iconType="MaterialCommunityIcons"
           placeholder="Dosage"
           value={state.dosage}
           onChangeText={text => handleChangeText('dosage', text)}
           errorMessage={validationError.dosage}
         />
         <Textbox
+          iconName="calendar-clock"
+          iconType="MaterialCommunityIcons"
           placeholder="Frequency"
           value={state.frequency}
           onChangeText={text => handleChangeText('frequency', text)}
           errorMessage={validationError.frequency}
         />
         <Textbox
+          iconName="note-text"
+          iconType="MaterialCommunityIcons"
           placeholder="Note"
           value={state.note}
           onChangeText={text => handleChangeText('note', text)}
