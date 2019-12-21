@@ -192,7 +192,7 @@ function Medications({ navigation, showActionSheetWithOptions }) {
             <SubText text={`Note: ${item.note}`} />
             {item.currentLog &&
               <React.Fragment>
-                <Text style={{ color: '#DD5144' }}>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
+                <Text style={{ color: '#DD5144', width: '100%' }}>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
               </React.Fragment>
             }
           </View>

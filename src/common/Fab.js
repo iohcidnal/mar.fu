@@ -1,9 +1,12 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import PropTypes from 'prop-types';
 import { Fab as FabNativeBase, Icon, Button } from 'native-base';
 import { withNavigation } from 'react-navigation';
 
 import { auth } from '../db';
+
+const fabBgColor = Platform.OS === 'ios' ? '#007AFF' : '#4855B8';
 
 function Fab({ navigation, onAdd }) {
   const [isActive, setIsActive] = React.useState(false);
@@ -15,7 +18,7 @@ function Fab({ navigation, onAdd }) {
 
   return (
     <FabNativeBase
-      style={{ backgroundColor: '#5067FF' }}
+      style={{ backgroundColor: fabBgColor }}
       active={isActive}
       onPress={() => setIsActive(value => !value)}
     >
