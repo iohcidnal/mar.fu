@@ -19,7 +19,8 @@ import {
   LOGS_SUBCOLLECTION,
   uniqueId,
   USERS_COLLECTION,
-  duration
+  duration,
+  SubText
 } from '../common';
 
 function Medications({ navigation, showActionSheetWithOptions }) {
@@ -185,13 +186,15 @@ function Medications({ navigation, showActionSheetWithOptions }) {
       <ListItem onPress={() => handleViewMedicationLogs(item)}>
         <Body>
           <View>
-            <Text>{item.name}</Text>
+            <Text style={{ fontSize: 17 }}>{item.name}</Text>
+            <SubText text={`Dosage: ${item.dosage}`} />
+            <SubText text={`Frequency: ${item.frequency}`} />
+            <SubText text={`Note: ${item.note}`} />
             {item.currentLog &&
               <React.Fragment>
-                <Text style={{ color: 'gray' }}>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
+                <Text style={{ color: '#DD5144' }}>{`Last taken: ${dayjs(item.currentLog.lastTakenDateTime.toDate()).format('ddd D MMM YYYY h:mm A')}`}</Text>
               </React.Fragment>
             }
-            <Text style={{ color: 'gray' }}>{`Note: ${item.note}`}</Text>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
             <Button transparent onPress={() => handleComplete(item)}>
