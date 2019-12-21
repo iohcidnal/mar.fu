@@ -5,7 +5,7 @@ import { NavigationEvents } from 'react-navigation';
 import { Container, Icon, ListItem, Button, Body, Text, Spinner, Toast, Right } from 'native-base';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-import { useCollection, Banner, Fab, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, duration } from '../common';
+import { useCollection, Banner, Fab, GROUPS_FOR_USER_COLLECTION, GROUPS_SUBCOLLECTION, duration, SubText } from '../common';
 import { db, auth } from '../db';
 
 function MedicationGroups({ navigation, showActionSheetWithOptions }) {
@@ -104,8 +104,8 @@ function MedicationGroups({ navigation, showActionSheetWithOptions }) {
     return (
       <ListItem onPress={() => handleViewMedications(item)}>
         <Body>
-          <Text>{item.name}</Text>
-          <Text style={{ color: 'gray' }}>{item.description}</Text>
+          <Text style={{ fontSize: 17 }}>{item.name}</Text>
+          <SubText text={item.description} />
           <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginTop: 10 }}>
             {/* 
             Sharing will be in a future version
