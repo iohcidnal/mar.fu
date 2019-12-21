@@ -18,7 +18,7 @@ const initialState = {
 
 export default function SignUp({ navigation }) {
   const [state, handleChangeText, resetState] = useHandleChangeText(initialState);
-  const [isSubmitting, handleSubmit] = useSubmit(signUpAsync, 'Your account has been created. Please check your email to verify your account.');
+  const [isSubmitting, handleSubmit] = useSubmit(signUpAsync, 'Your account has been created.');
   const [validate, validationError] = useValidation(() => validateForm());
   const shouldNavigateSetParams = React.useRef(true);
 
@@ -54,6 +54,7 @@ export default function SignUp({ navigation }) {
     await auth.signOut();
 
     resetState();
+    navigation.navigate('Login');
   }
 
   function validateForm() {
