@@ -8,7 +8,7 @@ import { auth } from '../db';
 
 const fabBgColor = Platform.OS === 'ios' ? '#007AFF' : '#4855B8';
 
-function Fab({ navigation, onAdd }) {
+function Fab({ navigation, shouldShowAdd = true, onAdd }) {
   const [isActive, setIsActive] = React.useState(false);
 
   const handleLogOut = async () => {
@@ -23,9 +23,11 @@ function Fab({ navigation, onAdd }) {
       onPress={() => setIsActive(value => !value)}
     >
       <Icon name="more" />
-      <Button style={{ backgroundColor: '#34A34F' }} onPress={() => onAdd()}>
-        <Icon name="add" />
-      </Button>
+      {shouldShowAdd &&
+        <Button style={{ backgroundColor: '#34A34F' }} onPress={() => onAdd()}>
+          <Icon name="add" />
+        </Button>
+      }
       <Button style={{ backgroundColor: '#DD5144' }} onPress={() => handleLogOut()}>
         <Icon name="log-out" />
       </Button>
@@ -35,7 +37,8 @@ function Fab({ navigation, onAdd }) {
 
 Fab.propTypes = {
   navigation: PropTypes.object.isRequired,
-  onAdd: PropTypes.func.isRequired
+  shouldShowAdd: PropTypes.bool,
+  onAdd: PropTypes.func
 };
 
 export default withNavigation(Fab);

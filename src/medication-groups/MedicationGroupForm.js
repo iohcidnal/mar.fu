@@ -14,7 +14,8 @@ import {
   useValidation,
   GROUPS_FOR_USER_COLLECTION,
   GROUPS_SUBCOLLECTION,
-  USERS_COLLECTION
+  USERS_COLLECTION,
+  Fab
 } from '../common';
 import { auth } from '../db';
 
@@ -102,6 +103,7 @@ export default function MedicationGroupForm({ navigation }) {
           onPress={() => navigation.goBack()}
         />
       </View>
+      <Fab shouldShowAdd={false} />
     </Container>
   );
 }

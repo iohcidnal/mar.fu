@@ -15,7 +15,8 @@ import {
   MEDICATIONS_FOR_GROUP_COLLECTION,
   MEDICATIONS_SUBCOLLECTION,
   GROUPS_FOR_USER_COLLECTION,
-  GROUPS_SUBCOLLECTION
+  GROUPS_SUBCOLLECTION,
+  Fab
 } from '../common';
 import { auth } from '../db';
 
@@ -122,6 +123,7 @@ export default function MedicationForm({ navigation }) {
           onPress={() => navigation.goBack()}
         />
       </View>
+      <Fab shouldShowAdd={false} />
     </Container>
   );
 }

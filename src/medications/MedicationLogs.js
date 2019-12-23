@@ -3,7 +3,7 @@ import { View, FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { ListItem, Body, Text, Container, Spinner, Icon } from 'native-base';
 
-import { useCollection, Banner, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION } from '../common';
+import { useCollection, Banner, MEDICATION_LOGS_COLLECTION, LOGS_SUBCOLLECTION, Fab } from '../common';
 import dayjs from 'dayjs';
 
 export default function MedicationLogs({ navigation }) {
@@ -58,6 +58,7 @@ export default function MedicationLogs({ navigation }) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
       />
+      <Fab shouldShowAdd={false} />
     </Container>
   );
 }
